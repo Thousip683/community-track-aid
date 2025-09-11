@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      civic_reports: {
+        Row: {
+          assigned_department: string | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          location_address: string | null
+          location_lat: number | null
+          location_lng: number | null
+          photo_urls: string[] | null
+          priority: string
+          public_notes: string | null
+          staff_notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          voice_note_url: string | null
+        }
+        Insert: {
+          assigned_department?: string | null
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          photo_urls?: string[] | null
+          priority?: string
+          public_notes?: string | null
+          staff_notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          voice_note_url?: string | null
+        }
+        Update: {
+          assigned_department?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          photo_urls?: string[] | null
+          priority?: string
+          public_notes?: string | null
+          staff_notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          voice_note_url?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
