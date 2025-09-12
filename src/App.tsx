@@ -27,8 +27,6 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true);
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="civic-ui-theme">
@@ -36,7 +34,6 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            {showIntro && <IntroPage onComplete={() => setShowIntro(false)} />}
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Homepage />} />
@@ -45,12 +42,12 @@ function App() {
                 
                 <Route path="/report" element={
                   <ProtectedRoute>
-                    <Layout><ReportIssue /></Layout>
+                    <ReportIssue />
                   </ProtectedRoute>
                 } />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <Layout><CitizenDashboard /></Layout>
+                    <CitizenDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/profile" element={
