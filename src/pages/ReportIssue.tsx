@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Upload, Camera, Phone, Zap, AlertTriangle } from "lucide-react";
+import { MapPin, Upload, Camera, Phone, Zap, AlertTriangle, Video, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useReports } from "@/hooks/useReports";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/Layout";
+import { MediaPreview } from "@/components/MediaPreview";
 
 const categories = [
   "Road Maintenance",
@@ -31,12 +32,12 @@ const ReportIssue = () => {
     description: "",
     category: "",
     location: "",
-    photos: [] as File[],
+    mediaFiles: [] as File[],
   });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { createReport, uploadPhotos } = useReports();
+  const { createReport, uploadMedia } = useReports();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +54,10 @@ const ReportIssue = () => {
     try {
       setSubmitting(true);
       
-      // Upload photos if any
-      let photoUrls: string[] = [];
-      if (formData.photos.length > 0) {
-        photoUrls = await uploadPhotos(formData.photos);
+      // Upload media files if any
+      let mediaUrls: string[] = [];
+      if (formData.mediaFiles.length > 0) {
+        mediaUrls = await uploadMedia(formData.mediaFiles);
       }
 
       // Parse location coordinates if provided
@@ -78,7 +79,7 @@ const ReportIssue = () => {
         location_address: formData.location,
         location_lat: locationLat,
         location_lng: locationLng,
-        photo_urls: photoUrls
+        photo_urls: mediaUrls
       });
 
       // Redirect to dashboard
@@ -92,7 +93,14 @@ const ReportIssue = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setFormData(prev => ({ ...prev, photos: [...prev.photos, ...files] }));
+    setFormData(prev => ({ ...prev, mediaFiles: [...prev.mediaFiles, ...files] }));
+  };
+
+  const removeMediaFile = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      mediaFiles: prev.mediaFiles.filter((_, i) => i !== index)
+    }));
   };
 
   const handleLocationDetect = () => {
@@ -234,38 +242,45 @@ const ReportIssue = () => {
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="photos">Photos</Label>
+                      <div className="space-y-4">
+                        <Label htmlFor="media">Media Files</Label>
                         <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-                          <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
+                          <div className="flex justify-center items-center space-x-4 mb-4">
+                            <Camera className="w-8 h-8 text-primary" />
+                            <Video className="w-8 h-8 text-green-500" />
+                            <Mic className="w-8 h-8 text-blue-500" />
+                          </div>
                           <p className="text-lg font-medium mb-2">
-                            Upload photos of the issue
+                            Upload photos, videos, or audio recordings
                           </p>
                           <p className="text-sm text-muted-foreground mb-4">
-                            Optional but recommended - photos help our teams respond faster
+                            Optional but recommended - media helps our teams respond faster
                           </p>
                           <input
                             type="file"
-                            id="photos"
+                            id="media"
                             multiple
-                            accept="image/*"
+                            accept="image/*,video/*,audio/*"
                             onChange={handleFileUpload}
                             className="hidden"
                           />
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => document.getElementById('photos')?.click()}
+                            onClick={() => document.getElementById('media')?.click()}
                             className="h-12 px-6"
                           >
-                            Choose Files
+                            <Upload className="w-4 h-4 mr-2" />
+                            Choose Media Files
                           </Button>
-                          {formData.photos.length > 0 && (
+                          {formData.mediaFiles.length > 0 && (
                             <p className="text-sm text-primary mt-3 font-medium">
-                              {formData.photos.length} file(s) selected
+                              {formData.mediaFiles.length} file(s) selected
                             </p>
                           )}
                         </div>
+                        
+                        <MediaPreview files={formData.mediaFiles} onRemove={removeMediaFile} />
                       </div>
 
                       <div className="flex gap-4 pt-6">

@@ -7,24 +7,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
-import { mockReports, categories, departments } from "@/data/mockData";
+import { useReports } from "@/hooks/useReports";
+import { categories, departments } from "@/data/mockData";
 import { Link } from "react-router-dom";
 import { Search, Filter, Download, Eye, MapPin, Calendar } from "lucide-react";
 
 const AdminIssues = () => {
+  const { reports, loading } = useReports();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
 
-  const filteredReports = mockReports.filter(report => {
+  const filteredReports = reports.filter(report => {
     const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.citizenName.toLowerCase().includes(searchTerm.toLowerCase());
+                         (report.citizen_name || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || report.status === statusFilter;
     const matchesCategory = categoryFilter === "all" || report.category === categoryFilter;
-    const matchesDepartment = departmentFilter === "all" || report.assignedDepartment === departmentFilter;
+    const matchesDepartment = departmentFilter === "all" || report.assigned_department === departmentFilter;
 
     return matchesSearch && matchesStatus && matchesCategory && matchesDepartment;
   });
@@ -39,9 +41,9 @@ const AdminIssues = () => {
         report.category,
         report.status,
         report.priority,
-        report.citizenName,
-        new Date(report.dateSubmitted).toLocaleDateString(),
-        report.assignedDepartment || "Unassigned"
+        report.citizen_name || 'Anonymous',
+        new Date(report.created_at).toLocaleDateString(),
+        report.assigned_department || "Unassigned"
       ].join(","))
     ].join("\n");
 
@@ -53,6 +55,14 @@ const AdminIssues = () => {
     a.click();
     window.URL.revokeObjectURL(url);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-96">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-civic-blue"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -136,9 +146,9 @@ const AdminIssues = () => {
           </div>
 
           <div className="flex justify-between items-center mt-4 pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
-              Showing {filteredReports.length} of {mockReports.length} issues
-            </div>
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredReports.length} of {reports.length} issues
+          </div>
             <Button 
               variant="outline" 
               size="sm"
@@ -181,14 +191,14 @@ const AdminIssues = () => {
                       <div className="font-medium">{report.title}</div>
                       <div className="text-sm text-muted-foreground flex items-center mt-1">
                         <MapPin className="w-3 h-3 mr-1" />
-                        {report.location.address}
+                        {report.location_address || 'No address provided'}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{report.citizenName}</div>
-                      <div className="text-sm text-muted-foreground">{report.citizenEmail}</div>
+                      <div className="font-medium">{report.citizen_name || 'Anonymous'}</div>
+                      <div className="text-sm text-muted-foreground">{report.citizen_email || 'No email'}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -201,8 +211,8 @@ const AdminIssues = () => {
                     <PriorityBadge priority={report.priority} />
                   </TableCell>
                   <TableCell>
-                    {report.assignedDepartment ? (
-                      <Badge variant="secondary">{report.assignedDepartment}</Badge>
+                    {report.assigned_department ? (
+                      <Badge variant="secondary">{report.assigned_department}</Badge>
                     ) : (
                       <span className="text-muted-foreground text-sm">Unassigned</span>
                     )}
@@ -210,7 +220,7 @@ const AdminIssues = () => {
                   <TableCell>
                     <div className="flex items-center text-sm">
                       <Calendar className="w-3 h-3 mr-1" />
-                      {new Date(report.dateSubmitted).toLocaleDateString()}
+                      {new Date(report.created_at).toLocaleDateString()}
                     </div>
                   </TableCell>
                   <TableCell>

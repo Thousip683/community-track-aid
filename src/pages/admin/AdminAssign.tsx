@@ -7,19 +7,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
-import { mockReports, departments } from "@/data/mockData";
+import { useReports } from "@/hooks/useReports";
+import { departments } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { Users, MapPin, Calendar, CheckSquare } from "lucide-react";
 
 const AdminAssign = () => {
+  const { reports, loading, updateReport } = useReports();
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
   const [bulkDepartment, setBulkDepartment] = useState("");
   const [bulkPriority, setBulkPriority] = useState("");
   const { toast } = useToast();
 
   // Filter to show only unassigned or submitted reports
-  const assignableReports = mockReports.filter(
-    report => !report.assignedDepartment || report.status === "submitted"
+  const assignableReports = reports.filter(
+    report => !report.assigned_department || report.status === "submitted"
   );
 
   const handleSelectReport = (reportId: string, checked: boolean) => {
@@ -38,7 +40,7 @@ const AdminAssign = () => {
     }
   };
 
-  const handleBulkAssign = () => {
+  const handleBulkAssign = async () => {
     if (selectedReports.length === 0) {
       toast({
         title: "No Reports Selected",
@@ -57,16 +59,40 @@ const AdminAssign = () => {
       return;
     }
 
-    toast({
-      title: "Assignment Successful",
-      description: `${selectedReports.length} reports have been assigned to ${bulkDepartment}.`,
-    });
+    try {
+      // Update all selected reports
+      await Promise.all(selectedReports.map(reportId => 
+        updateReport(reportId, {
+          assigned_department: bulkDepartment,
+          ...(bulkPriority && { priority: bulkPriority as 'low' | 'medium' | 'high' })
+        })
+      ));
 
-    // Reset selections
-    setSelectedReports([]);
-    setBulkDepartment("");
-    setBulkPriority("");
+      toast({
+        title: "Assignment Successful",
+        description: `${selectedReports.length} reports have been assigned to ${bulkDepartment}.`,
+      });
+
+      // Reset selections
+      setSelectedReports([]);
+      setBulkDepartment("");
+      setBulkPriority("");
+    } catch (error) {
+      toast({
+        title: "Assignment Failed",
+        description: "There was an error assigning the reports.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-96">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-civic-blue"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -112,7 +138,7 @@ const AdminAssign = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {mockReports.filter(r => r.priority === "high").length}
+                  {reports.filter(r => r.priority === "high").length}
                 </p>
                 <p className="text-sm text-muted-foreground">High Priority</p>
               </div>
@@ -128,7 +154,7 @@ const AdminAssign = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {mockReports.filter(r => !r.assignedDepartment).length}
+                  {reports.filter(r => !r.assigned_department).length}
                 </p>
                 <p className="text-sm text-muted-foreground">Unassigned</p>
               </div>
@@ -228,7 +254,7 @@ const AdminAssign = () => {
                       <div className="font-medium">{report.title}</div>
                       <div className="text-sm text-muted-foreground flex items-center mt-1">
                         <MapPin className="w-3 h-3 mr-1" />
-                        {report.location.address}
+                        {report.location_address || 'No address provided'}
                       </div>
                     </div>
                   </TableCell>
@@ -242,8 +268,8 @@ const AdminAssign = () => {
                     <PriorityBadge priority={report.priority} />
                   </TableCell>
                   <TableCell>
-                    {report.assignedDepartment ? (
-                      <Badge variant="secondary">{report.assignedDepartment}</Badge>
+                    {report.assigned_department ? (
+                      <Badge variant="secondary">{report.assigned_department}</Badge>
                     ) : (
                       <span className="text-muted-foreground text-sm">Unassigned</span>
                     )}
@@ -251,7 +277,7 @@ const AdminAssign = () => {
                   <TableCell>
                     <div className="flex items-center text-sm">
                       <Calendar className="w-3 h-3 mr-1" />
-                      {new Date(report.dateSubmitted).toLocaleDateString()}
+                      {new Date(report.created_at).toLocaleDateString()}
                     </div>
                   </TableCell>
                 </TableRow>
