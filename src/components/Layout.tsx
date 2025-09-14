@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, Home, BarChart3, Users } from "lucide-react";
+import { FileText, Home, BarChart3, Users, Menu, X } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,6 +10,7 @@ interface LayoutProps {
 
 export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const citizenNavItems = [
     { path: "/", label: "Home", icon: Home },
@@ -28,7 +29,7 @@ export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
   const navItems = type === "admin" ? adminNavItems : citizenNavItems;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="bg-card border-b shadow-card sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -41,6 +42,7 @@ export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
               </span>
             </Link>
 
+            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -62,25 +64,79 @@ export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
               })}
             </nav>
 
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded hover:bg-muted transition"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-label="Open menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* Admin/Citizen Actions */}
             {type === "admin" && (
-              <div className="flex items-center space-x-2">
+              <div className="hidden md:flex items-center space-x-2">
                 <span className="text-sm text-muted-foreground hidden sm:block">Admin Panel</span>
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/">View Citizen Site</Link>
                 </Button>
               </div>
             )}
-
             {type === "citizen" && (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/admin/login">Staff Login</Link>
-              </Button>
+              <div className="hidden md:flex">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/admin/login">Staff Login</Link>
+                </Button>
+              </div>
             )}
           </div>
         </div>
+        {/* Mobile Nav Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-card border-b shadow-card absolute top-16 left-0 w-full z-40 animate-in fade-in slide-in-from-top-4">
+            <nav className="flex flex-col px-4 py-4 space-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted text-foreground"
+                    } transition`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              {type === "admin" && (
+                <div className="flex flex-col space-y-2 mt-2">
+                  <span className="text-xs text-muted-foreground pl-2">Admin Panel</span>
+                  <Button variant="outline" size="sm" asChild className="w-full">
+                    <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+                      View Citizen Site
+                    </Link>
+                  </Button>
+                </div>
+              )}
+              {type === "citizen" && (
+                <Button variant="outline" size="sm" asChild className="w-full mt-2">
+                  <Link to="/admin/login" onClick={() => setMobileMenuOpen(false)}>
+                    Staff Login
+                  </Link>
+                </Button>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
 
       <footer className="bg-muted/30 border-t mt-auto">
         <div className="container mx-auto px-4 py-8">
