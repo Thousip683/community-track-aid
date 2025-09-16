@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,12 @@ import { getLocationDisplay } from "@/utils/locationUtils";
 
 const CitizenDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("all");
-  const { reports, loading } = useReports();
+  const { reports, loading, fetchUserReports } = useReports();
+
+  // Fetch user reports on component mount
+  useEffect(() => {
+    fetchUserReports();
+  }, []);
 
   // Filter reports based on selected tab
   const filteredReports = reports.filter(report => {

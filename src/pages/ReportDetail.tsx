@@ -8,6 +8,7 @@ import { useReports } from "@/hooks/useReports";
 import { ArrowLeft, MapPin, Calendar, User, Phone, Mail, FileText } from "lucide-react";
 import { MediaViewer } from "@/components/MediaViewer";
 import { getLocationDisplay } from "@/utils/locationUtils";
+import { Map } from "@/components/ui/map";
 
 const ReportDetail = () => {
   const { id } = useParams();

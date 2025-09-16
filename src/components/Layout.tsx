@@ -1,7 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, Home, BarChart3, Users, Menu, X } from "lucide-react";
+import { FileText, Home, BarChart3, Users, Menu, X, ArrowLeft } from "lucide-react";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 interface LayoutProps {
@@ -70,6 +70,15 @@ export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
               {type === "citizen" && (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/admin/login">Admin Login</Link>
+                </Button>
+              )}
+              
+              {type === "admin" && (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Citizen Mode
+                  </Link>
                 </Button>
               )}
               
