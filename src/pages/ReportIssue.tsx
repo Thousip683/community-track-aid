@@ -342,7 +342,7 @@ const ReportIssue = () => {
                         </p>
                         <div className="bg-amber-100 dark:bg-amber-900/50 rounded-lg p-3">
                           <p className="text-lg font-bold text-amber-800 dark:text-amber-200">
-                            📞 (555) 911-CITY
+                            📞 100 - Police 
                           </p>
                         </div>
                       </div>
