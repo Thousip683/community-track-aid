@@ -208,7 +208,21 @@ const ReportDetail = () => {
             </Card>
 
             {/* Quick Actions */}
-           
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button variant="outline" className="w-full" disabled>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Download Report
+                </Button>
+                <Button variant="outline" className="w-full" disabled>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Contact Support
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

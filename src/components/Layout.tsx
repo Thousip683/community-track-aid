@@ -165,14 +165,14 @@ export const Layout = ({ children, type = "citizen" }: LayoutProps) => {
             <div>
               <h4 className="font-medium text-foreground mb-3">Contact</h4>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>Phone: 9876543210</p>
+                <p>Phone: (555) 123-CITY</p>
                 <p>Email: help@civicreport.gov</p>
-                <p>Timing:Anytime</p>
+                <p>Hours: Mon-Fri 8AM-5PM</p>
               </div>
             </div>
           </div>
           <div className="border-t pt-6 mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
-            <p>&copy; 2025 CivicReport System. All rights reserved.</p>
+            <p>&copy; 2024 CivicReport System. All rights reserved.</p>
             <div className="flex space-x-4 mt-2 sm:mt-0">
               <Link to="/privacy" className="hover:text-foreground transition-smooth">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-foreground transition-smooth">Terms of Service</Link>
