@@ -214,6 +214,11 @@ const AdminIssues = () => {
                     <PriorityBadge priority={report.priority} />
                   </TableCell>
                   <TableCell>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      0 ↑
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     {report.assigned_department ? (
                       <Badge variant="secondary">{report.assigned_department}</Badge>
                     ) : (
